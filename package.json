@@ -1,0 +1,19 @@
+{
+  "name": "chat",
+  "version": "1.0.0",
+  "description": "chat via SSE",
+  "type": "module",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "keywords": [
+    "chat",
+    "SSE"
+  ],
+  "author": "Voronin Anton, stalker8610@gmail.com",
+  "license": "ISC",
+  "dependencies": {
+    "express": "^4.18.2"
+  }
+}

@@ -1,0 +1,89 @@
+<!DOCTYPE html>
+<html encode="UTF-8">
+<head>
+<title>Super chat from ASVCOM</title>
+</head>
+<body>
+
+<div id="connected">
+	<span id="greeting" style="font-size:120%;font-family:arial;color:green;"></span>
+	<button type="button" onclick="disconnect()">Disconnect</button>
+</div>
+
+<form id="signIn" name="signIn" action="">
+	<label for="name">Enter your name:</label>
+	<input type="text" id="userName" name="userName" maxlength="20" required="true" placeholder="Ivanov Ivan"></input>
+	<input type="button" onclick="connect()" value="Connect to chat"></button>
+</form>
+<p></p>
+<form id="newMessageForm" name="newMessageForm" action="/postMessage" method="POST">
+	<textarea id="message" name="message" cols="100" rows="5" placeholder="Write new message here..."></textarea>
+	<input type="hidden" name="userName" id="messageUserName"></input>
+	<div>
+	<button type="button" onclick="postMessage()" title="Send message">Send</input>
+	</div>
+</form>
+<p>
+<textarea id="chat" cols="100" rows="50"></textarea>
+</p>
+
+<script>
+
+var connectStatus;
+var eventSource;
+var userName;
+
+function connect(){
+	userName = document.getElementById("userName").value;
+	if (!userName){
+		alert('Please fill out user name to connect!');
+		return;
+	}
+	eventSource = new EventSource(`/connect?userName=${userName}`);
+	eventSource.onmessage = function(event){
+		document.getElementById("chat").innerHTML+=event.data+"\n";
+	}
+	
+	connectStatus = 'connected';
+	onUpdateConnectStatus();
+}
+
+function disconnect(){
+	eventSource.close();
+	connectStatus = 'disconnected'
+	onUpdateConnectStatus();
+}
+
+function onUpdateConnectStatus(){
+	if (connectStatus === 'connected'){
+		document.getElementById("connected").style.visibility = 'visible';		
+		document.getElementById("greeting").innerHTML = `Welcome to chat, ${userName}!`;
+		document.getElementById("signIn").style.visibility = 'hidden';		
+		document.getElementById("messageUserName").value = userName;
+		let newMessageFormElements = document.getElementById("newMessageForm").elements;
+		Array.from(newMessageFormElements).forEach(element=>element.disabled = false);
+	} else {
+		document.getElementById("connected").style.visibility = 'hidden';
+		document.getElementById("signIn").style.visibility = 'visible';		
+		let newMessageFormElements = document.getElementById("newMessageForm").elements;
+		Array.from(newMessageFormElements).forEach(element=>element.disabled = true);
+	}
+}
+
+window.onload = () => {
+	connectStatus = 'disconnected';
+	onUpdateConnectStatus();
+}
+
+function postMessage() {
+	let form = document.getElementById("newMessageForm");
+	form.submit();
+	form.reset();
+	return false;
+}
+
+</script>
+
+
+</body>
+</html>
